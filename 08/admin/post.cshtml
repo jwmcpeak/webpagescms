@@ -1,0 +1,46 @@
+﻿@{
+    Page.Title = "Post Management";
+    Layout = "~/admin/_AdminLayout.cshtml";
+
+    var mode = Post.Mode;
+    //var slug = Post.Slug;
+}
+
+@if (!mode.IsEmpty())
+{
+    var post = Post.Current;
+
+    <div>
+        <form name="post" method="post" action="~/admin/post.ashx">
+            <input type="hidden" name="mode" value="@mode" />
+            <input type="hidden" name="postId" value="@post.Id" />
+            <p>Title: <input type="text" name="postTitle" value="@post.Title" /></p>
+            <p>Content: <textarea name="postContent">@post.Content</textarea></p>
+            <p>Slug: <input type="text" name="postSlug" value="@post.Slug" /></p>
+            <p>Date Published: <input type="text" name="postDatePublished" value="@post.DatePublished" /></p>
+
+            <p><input type="submit" name="postSubmit" value="Submit" /></p>
+
+        </form>
+    </div>
+}
+else
+{
+    var grid = new WebGrid(
+        source: PostRepository.GetAll(orderBy: "DateCreated DESC"),
+        rowsPerPage: 30);
+
+    @grid.GetHtml(
+    columns: grid.Columns(
+    grid.Column(format: @<a href="~/admin/post/edit/@item.Slug">Edit</a>),
+    grid.Column(format: @<a href="~/admin/post/delete/@item.Slug">Delete</a>),
+    grid.Column("Title"),
+    grid.Column("DateCreated", header: "Date Created"),
+    grid.Column("DatePublished", header: "Published" ),
+            grid.Column("AuthorId", header: "Author")
+
+                    )
+                );
+}
+
+

@@ -1,0 +1,31 @@
+﻿@{
+    Page.Title = "Title goes here";
+    Layout = "~/_SiteLayout.cshtml";
+
+    var mode = Tag.Mode;
+}
+
+<div>
+    @if (mode == "post")
+    {
+        @RenderPage("~/_post.cshtml", Post.Current, new MarkdownSharp.Markdown())
+    }
+    else if (mode == "tag")
+    {
+        var posts = PostRepository.GetPublishedPostsByTag(Tag.FriendlyName);
+
+        foreach (var post in posts)
+        {
+            @RenderPage("~/_post.cshtml", post, new MarkdownSharp.Markdown());
+        }
+    }
+    else if (string.IsNullOrEmpty(mode))
+    {
+        var posts = PostRepository.GetPublishedPosts();
+
+        foreach (var post in posts)
+        {
+            @RenderPage("~/_post.cshtml", post, new MarkdownSharp.Markdown());
+        }
+    }
+</div>

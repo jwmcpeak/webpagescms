@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>@Page.Title</title>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery-ui-1.10.3.min.js"></script>
+    <link href="~/css/site.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/jquery.ui.all.css" rel="stylesheet" />
+
+    @RenderSection("head", required: false)
+</head>
+<body>
+    <header>
+        <div class="content-wrapper">
+            <div class="float-left">
+                <p class="site-title"><a href="~/">SimpleCMS</a></p>
+            </div>
+            <div class="float-right">
+                <nav>
+                    <ul id="menu">
+                        <li><a href="~/">Home</a></li>
+                        @if (WebUser.IsAuthenticated) {
+                            var isAdmin = WebUser.HasRole(UserRoles.Admin);
+                            var isEditor = WebUser.HasRole(UserRoles.Editor);
+                            var isAuthor = WebUser.HasRole(UserRoles.Author);
+                            
+                            <li><a href="~/admin/">Admin</a></li>
+                            <li><a href="~/admin/post/">Posts</a></li>
+                            
+                            if (isAdmin || isEditor) { 
+                                <li><a href="~/admin/tag/">Tags</a></li>
+                            }
+                            
+                            if (isAdmin) { 
+                                <li><a href="~/admin/account/">Accounts</a></li>
+                                <li><a href="~/admin/role/">Roles</a></li>
+                            }
+                            
+                            <li><a href="~/logout/">Logout</a></li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <div id="body">
+        @RenderSection("featured", required: false)
+        <section class="content-wrapper main-content clear-fix">
+            @RenderBody()
+        </section>
+    </div>
+    <footer>
+        <div class="content-wrapper">
+            <div class="float-left">
+                <p>&copy; @DateTime.Now.Year - My ASP.NET Web Page</p>
+            </div>
+        </div>
+    </footer>
+    @RenderSection("Scripts", required: false)
+    <script>
+        $("a[data-mode=delete]").click(function (evt) {
+            evt.preventDefault();
+
+            if (!confirm("Are you sure you want to delete this resource?")) {
+                return;
+            }
+
+            var data = $(this).data();
+            var token = $("input[name=__RequestVerificationToken]").val();
+
+            $.post(data.action, {
+                mode: data.mode,
+                resourceItem: data.item,
+                __RequestVerificationToken: token
+            }, function () {
+                location.reload()
+            });
+        });
+
+
+    </script>
+</body>
+</html>

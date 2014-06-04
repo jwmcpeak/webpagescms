@@ -1,0 +1,19 @@
+﻿@{
+    Page.Title = "Title goes here";
+    Layout = "~/_SiteLayout.cshtml";
+
+    var posts = PostRepository.GetPublishedPosts();
+    var md = new MarkdownSharp.Markdown();
+}
+
+<div>
+    @foreach (var post in posts)
+    {
+        <div class="post-container">
+            <h2 class="post-title">@post.Title</h2>
+            <div class="post-content">
+                @Html.Raw(md.Transform(post.Content))
+            </div>
+        </div>
+    }
+</div>

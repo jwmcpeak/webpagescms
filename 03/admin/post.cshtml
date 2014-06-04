@@ -1,0 +1,13 @@
+﻿@{
+    Page.Title = "Title goes here";
+    //Layout = "Your Layout Page goes here";
+}
+
+<div>
+    <form name="post" method="post" action="~/admin/post.ashx">
+        <p>Title: <input type="text" name="postTitle" /></p>
+        <p>Content: <textarea name="postContent"></textarea></p>
+        <p><input type="submit" name="postSubmit" value="Create Post" /></p>
+
+    </form>
+</div>

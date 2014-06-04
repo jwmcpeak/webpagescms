@@ -1,0 +1,42 @@
+﻿@{
+    Page.Title = "Tag Management";
+    Layout = "~/admin/_AdminLayout.cshtml";
+
+    var mode = Tag.Mode;
+}
+
+@if (!mode.IsEmpty())
+{
+    var tag = Tag.Current;
+
+    <div>
+        <form name="tag" method="post" action="~/admin/tag.ashx">
+            <input type="hidden" name="mode" value="@mode" />
+            <input type="hidden" name="tagId" value="@tag.Id" />
+            <p>Name: <input type="text" name="tagName" value="@tag.Name" /></p>
+            <p>Friendly Name: <input type="text" name="tagFriendlyName" value="@tag.UrlFriendlyName" /></p>
+
+            <p><input type="submit" name="tagSubmit" value="Submit" /></p>
+
+        </form>
+    </div>
+}
+else
+{
+    <p><a href="~/admin/tag/new/">Create New Tag</a></p>
+    var grid = new WebGrid(
+        source: TagRepository.GetAll(orderBy: "Name"),
+        rowsPerPage: 30);
+
+    @grid.GetHtml(
+    columns: grid.Columns(
+    grid.Column(format: @<a href="~/admin/tag/edit/@item.UrlFriendlyName">Edit</a>),
+    grid.Column(format: @<a href="~/admin/tag/delete/@item.UrlFriendlyName">Delete</a>),
+    grid.Column("Name"),
+    grid.Column("UrlFriendlyName", header: "Friendly Name")
+
+                    )
+                );
+}
+
+

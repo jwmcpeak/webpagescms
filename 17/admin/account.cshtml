@@ -1,0 +1,78 @@
+﻿@{
+    Page.Title = "Account Management";
+    Layout = "~/admin/_AdminLayout.cshtml";
+
+    var mode = Post.Mode;
+
+    if (!WebUser.HasRole(UserRoles.Admin))
+    {
+        Response.Redirect("~/admin/");
+    }
+}
+
+@if (!mode.IsEmpty())
+{
+    var account = Account.Current;
+    var roles = RoleRepository.GetAll();
+
+    var rolesForUser = WebUser.GetRolesForUser((int)account.Id);
+    
+    //var postTags = (IEnumerable<dynamic>)post.Tags;
+
+    <div>
+        <form name="account" method="post" action="~/admin/account.ashx">
+            @AntiForgery.GetHtml()
+            <input type="hidden" id="mode" name="mode" value="@mode" />
+            <input type="hidden" id="accountId" name="accountId" value="@account.Id" />
+            <p>
+                <label for="accountName">Username:</label>
+                <input type="text" id="accountName" name="accountName" value="@account.Username" />
+            </p>
+            <p>
+                <label for="accountPassword1">Password:</label>
+                <input type="password" id="accountPassword1" name="accountPassword1" value="" />
+            </p>
+            <p>
+                <label for="accountPassword2">Password:</label>
+                <input type="password" id="accountPassword2" name="accountPassword2" value="" />
+            </p>
+
+            <p>
+                <label for="accountEmail">Email:</label>
+                <input type="text" id="accountEmail" name="accountEmail" value="@account.Email" />
+            </p>
+            <p>
+                <label for="accountRoles">Roles:</label>
+                <select id="accountRoles" name="accountRoles" multiple>
+                    @foreach (var role in roles)
+                    {
+                        <option value="@role.Id" selected="@rolesForUser.Contains((string)role.Name)">@role.Name</option>
+                    }
+                </select>
+            </p>
+            <p><input type="submit" name="accountSubmit" value="Submit" /></p>
+
+        </form>
+    </div>
+}
+else
+{
+        <p><a href="~/admin/account/new/">Create New User</a></p>
+        @AntiForgery.GetHtml()
+
+    var grid = new WebGrid(
+        source: AccountRepository.GetAll(orderBy: "Username"),
+        rowsPerPage: 30);
+
+    @grid.GetHtml(
+    columns: grid.Columns(
+    grid.Column(format: @<a href="~/admin/account/edit/@item.Username">Edit</a>),
+    grid.Column(format: @<a data-mode="delete" data-action="/admin/account.ashx" data-item="@item.Username" href="~/admin/account/delete/@item.Username">Delete</a>),
+        grid.Column("Username", header: "User Name"),
+        grid.Column("Email", header: "Email Address")
+
+                        )
+                    );
+}
+
+

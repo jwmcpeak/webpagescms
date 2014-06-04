@@ -1,0 +1,30 @@
+﻿@{
+    Page.Title = "Login";
+    Layout = "~/_SiteLayout.cshtml";
+
+    var message = string.Empty;
+
+    if (IsPost)
+    {
+        var username = Request.Form["username"];
+        var password = Request.Form["password"];
+
+        if (WebUser.AuthenticateAndLogin(username, password))
+        {
+            Response.Redirect("~/admin/");
+        }
+
+        message = "Username and/or password is incorrect.";
+    }
+}
+
+<div>
+    <div class="error">@message</div>
+
+    <form name="login" method="post">
+        <p><label for="username">Username:</label>
+            <input type="text" id="username" name="username" /></p>
+        <p><label for="password">Password:</label> <input type="password" id="password" name="password" /></p>
+        <p><input type="submit" value="Login" /></p>
+    </form>
+</div>

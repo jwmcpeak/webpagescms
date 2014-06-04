@@ -1,0 +1,64 @@
+﻿@{
+    Page.Title = "Account Management";
+    Layout = "~/admin/_AdminLayout.cshtml";
+
+    var mode = Post.Mode;
+
+    if (!WebUser.HasRole(UserRoles.Admin))
+    {
+        Response.Redirect("~/admin/");
+    }
+}
+
+@if (!mode.IsEmpty())
+{
+    var account = Account.Current;
+    var roles = RoleRepository.GetAll();
+
+    var rolesForUser = WebUser.GetRolesForUser((int)account.Id);
+    
+    //var postTags = (IEnumerable<dynamic>)post.Tags;
+
+    <div>
+        <form name="account" method="post" action="~/admin/account.ashx">
+            @AntiForgery.GetHtml()
+            <input type="hidden" name="mode" value="@mode" />
+            <input type="hidden" name="accountId" value="@account.Id" />
+            <p>Username: <input type="text" name="accountName" value="@account.Username" /></p>
+            <p>Password: <input type="password" name="accountPassword1" value="" /></p>
+            <p>Password: <input type="password" name="accountPassword2" value="" /></p>
+
+            <p>Email: <input type="text" name="accountEmail" value="@account.Email" /></p>
+            <p>
+                <select name="accountRoles" multiple>
+                    @foreach (var role in roles)
+                    {
+                        <option value="@role.Id" selected="@rolesForUser.Contains((string)role.Name)">@role.Name</option>
+                    }
+                </select>
+            </p>
+            <p><input type="submit" name="accountSubmit" value="Submit" /></p>
+
+        </form>
+    </div>
+}
+else
+{
+        <p><a href="~/admin/account/new/">Create New User</a></p>
+
+    var grid = new WebGrid(
+        source: AccountRepository.GetAll(orderBy: "Username"),
+        rowsPerPage: 30);
+
+    @grid.GetHtml(
+    columns: grid.Columns(
+    grid.Column(format: @<a href="~/admin/account/edit/@item.Username">Edit</a>),
+    grid.Column(format: @<a href="~/admin/account/delete/@item.Username">Delete</a>),
+    grid.Column("Username", header: "User Name"),
+    grid.Column("Email", header: "Email Address")
+
+                    )
+                );
+}
+
+

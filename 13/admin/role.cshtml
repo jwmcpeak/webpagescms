@@ -1,0 +1,44 @@
+﻿@{
+    Page.Title = "Role Management";
+    Layout = "~/admin/_AdminLayout.cshtml";
+
+    var mode = Role.Mode;
+
+    if (!WebUser.HasRole(UserRoles.Admin))
+    {
+        Response.Redirect("~/admin/");
+    }
+}
+
+@if (!mode.IsEmpty())
+{
+    var role = Role.Current;
+
+    <div>
+        <form name="role" method="post" action="~/admin/role.ashx">
+            <input type="hidden" name="mode" value="@mode" />
+            <input type="hidden" name="roleId" value="@role.Id" />
+            <p>Name: <input type="text" name="roleName" value="@role.Name" /></p>
+
+            <p><input type="submit" name="roleSubmit" value="Submit" /></p>
+        </form>
+    </div>
+}
+else
+{
+    <p><a href="~/admin/role/new/">Create New Role</a></p>
+    var grid = new WebGrid(
+        source: RoleRepository.GetAll(orderBy: "Name"),
+        rowsPerPage: 30);
+
+    @grid.GetHtml(
+    columns: grid.Columns(
+    grid.Column(format: @<a href="~/admin/role/edit/@item.Name">Edit</a>),
+    grid.Column(format: @<a href="~/admin/role/delete/@item.Name">Delete</a>),
+    grid.Column("Name")
+
+                    )
+                );
+}
+
+
